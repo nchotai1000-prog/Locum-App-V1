@@ -1,0 +1,12 @@
+# Virtual environment (can be recreated from requirements.txt)
+venv/
+
+# Python cache files (created automatically)
+__pycache__/
+*.pyc
+
+# Database file (contains personal shift data)
+*.db
+
+# macOS system files
+.DS_Store
