@@ -1,7 +1,7 @@
 from datetime import date
 
 from flask import Flask, redirect, render_template, request
-from database import add_shift, get_month_total, get_shifts, init_db
+from database import add_shift, delete_shift, get_month_total, get_shifts, init_db
 
 app = Flask(__name__)
 
@@ -30,6 +30,12 @@ def add():
     hours = float(request.form["hours"])
     hourly_rate = float(request.form["hourly_rate"])
     add_shift(shift_date, hours, hourly_rate)
+    return redirect("/")
+
+
+@app.route("/delete/<int:shift_id>", methods=["POST"])
+def delete(shift_id):
+    delete_shift(shift_id)
     return redirect("/")
 
 

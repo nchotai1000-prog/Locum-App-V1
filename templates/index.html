@@ -37,6 +37,7 @@
                 <th>Hours</th>
                 <th>Rate (£/hr)</th>
                 <th>Earnings (£)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +47,11 @@
                 <td>{{ shift["hours"] }}</td>
                 <td>{{ "%.2f"|format(shift["hourly_rate"]) }}</td>
                 <td>{{ "%.2f"|format(shift["hours"] * shift["hourly_rate"]) }}</td>
+                <td>
+                    <form method="post" action="/delete/{{ shift['id'] }}" onsubmit="return confirm('Delete this shift?');">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

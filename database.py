@@ -62,3 +62,10 @@ def get_month_total(month):
     ).fetchone()
     connection.close()
     return row["total"] or 0
+
+
+def delete_shift(shift_id):
+    connection = get_connection()
+    connection.execute("DELETE FROM shifts WHERE id = ?", (shift_id,))
+    connection.commit()
+    connection.close()
