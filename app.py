@@ -1,7 +1,7 @@
 from datetime import date
 
 from flask import Flask, redirect, render_template, request
-from database import add_shift, get_shifts, init_db
+from database import add_shift, get_month_total, get_shifts, init_db
 
 app = Flask(__name__)
 
@@ -13,8 +13,15 @@ def uk_date(value):
 
 @app.route("/")
 def index():
+    today = date.today()
     shifts = get_shifts()
-    return render_template("index.html", shifts=shifts)
+    month_total = get_month_total(today.strftime("%Y-%m"))
+    return render_template(
+        "index.html",
+        shifts=shifts,
+        month_name=today.strftime("%B %Y"),
+        month_total=month_total,
+    )
 
 
 @app.route("/add", methods=["POST"])

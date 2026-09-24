@@ -52,3 +52,13 @@ def get_shifts():
     ).fetchall()
     connection.close()
     return shifts
+
+
+def get_month_total(month):
+    connection = get_connection()
+    row = connection.execute(
+        "SELECT SUM(hours * hourly_rate) AS total FROM shifts WHERE shift_date LIKE ?",
+        (month + "-%",),
+    ).fetchone()
+    connection.close()
+    return row["total"] or 0

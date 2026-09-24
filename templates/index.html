@@ -8,6 +8,9 @@
 <body>
     <h1>Locum Tracker</h1>
 
+    <h2>This month</h2>
+    <p>{{ month_name }}: <strong>£{{ "%.2f"|format(month_total) }}</strong></p>
+
      <h2>Log a shift</h2>
     <form method="post" action="/add">
         <p>
