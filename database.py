@@ -34,3 +34,21 @@ def add_shift(shift_date, hours, hourly_rate):
     connection.commit()
     connection.close()
 
+
+def add_shift(shift_date, hours, hourly_rate):
+    connection = get_connection()
+    connection.execute(
+        "INSERT INTO shifts (shift_date, hours, hourly_rate) VALUES (?, ?, ?)",
+        (shift_date, hours, hourly_rate),
+    )
+    connection.commit()
+    connection.close()
+
+
+def get_shifts():
+    connection = get_connection()
+    shifts = connection.execute(
+        "SELECT * FROM shifts ORDER BY shift_date DESC, id DESC"
+    ).fetchall()
+    connection.close()
+    return shifts
