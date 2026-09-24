@@ -23,3 +23,14 @@ def init_db():
     )
     connection.commit()
     connection.close()
+
+
+def add_shift(shift_date, hours, hourly_rate):
+    connection = get_connection()
+    connection.execute(
+        "INSERT INTO shifts (shift_date, hours, hourly_rate) VALUES (?, ?, ?)",
+        (shift_date, hours, hourly_rate),
+    )
+    connection.commit()
+    connection.close()
+
