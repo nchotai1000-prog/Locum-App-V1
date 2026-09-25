@@ -17,8 +17,12 @@ def init_db():
         CREATE TABLE IF NOT EXISTS shifts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             shift_date TEXT NOT NULL,
-            hours REAL NOT NULL,
-            hourly_rate REAL NOT NULL
+            start_time TEXT NOT NULL,
+            end_time TEXT NOT NULL,
+            day_rate REAL NOT NULL,
+            ooh_rate REAL NOT NULL,
+            ooh_start TEXT NOT NULL,
+            ooh_end TEXT NOT NULL
         )
         """
     )
@@ -26,21 +30,15 @@ def init_db():
     connection.close()
 
 
-def add_shift(shift_date, hours, hourly_rate):
+def add_shift(shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end):
     connection = get_connection()
     connection.execute(
-        "INSERT INTO shifts (shift_date, hours, hourly_rate) VALUES (?, ?, ?)",
-        (shift_date, hours, hourly_rate),
-    )
-    connection.commit()
-    connection.close()
-
-
-def add_shift(shift_date, hours, hourly_rate):
-    connection = get_connection()
-    connection.execute(
-        "INSERT INTO shifts (shift_date, hours, hourly_rate) VALUES (?, ?, ?)",
-        (shift_date, hours, hourly_rate),
+        """
+        INSERT INTO shifts
+            (shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end),
     )
     connection.commit()
     connection.close()
@@ -49,20 +47,20 @@ def add_shift(shift_date, hours, hourly_rate):
 def get_shifts():
     connection = get_connection()
     shifts = connection.execute(
-        "SELECT * FROM shifts ORDER BY shift_date DESC, id DESC"
+        "SELECT * FROM shifts ORDER BY shift_date DESC, start_time DESC, id DESC"
     ).fetchall()
     connection.close()
     return shifts
 
 
-def get_month_total(month):
+def get_shifts_for_month(month):
     connection = get_connection()
-    row = connection.execute(
-        "SELECT SUM(hours * hourly_rate) AS total FROM shifts WHERE shift_date LIKE ?",
+    shifts = connection.execute(
+        "SELECT * FROM shifts WHERE shift_date LIKE ?",
         (month + "-%",),
-    ).fetchone()
+    ).fetchall()
     connection.close()
-    return row["total"] or 0
+    return shifts
 
 
 def delete_shift(shift_id):
