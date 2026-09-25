@@ -7,12 +7,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <p class="demo-banner">
+        <strong>Demo version:</strong> all entries are public and shared with other visitors.
+        Please don't enter real information.
+    </p>
+
     <h1>Locum Tracker</h1>
 
     <h2>This month</h2>
     <p>{{ month_name }}: <strong>£{{ "%.2f"|format(month_total) }}</strong></p>
 
-     <h2>Log a shift</h2>
+    <h2>Log a shift</h2>
     <form method="post" action="/add">
         <p>
             <label for="shift_date">Date</label>
@@ -29,7 +34,7 @@
         <button type="submit">Save shift</button>
     </form>
 
-        <h2>Your shifts</h2>
+    <h2>Your shifts</h2>
     {% if shifts %}
     <table>
         <thead>

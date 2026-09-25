@@ -38,3 +38,10 @@ td {
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+
+.demo-banner {
+    background-color: #fff4d6;
+    border: 1px solid #e6c65c;
+    border-radius: 6px;
+    padding: 10px 14px;
+}
