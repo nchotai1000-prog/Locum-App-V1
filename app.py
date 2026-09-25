@@ -6,10 +6,12 @@ from database import (
     add_shift,
     delete_profile,
     delete_shift,
+    get_goal,
     get_profiles,
     get_shifts,
     get_shifts_for_month,
     init_db,
+    set_goal,
 )
 from pay import calculate_earnings, split_minutes
 
@@ -43,16 +45,41 @@ def shift_details(shift):
 @app.route("/")
 def index():
     today = date.today()
+    today_text = today.isoformat()
+    month = today.strftime("%Y-%m")
+
     shifts = [shift_details(shift) for shift in get_shifts()]
-    month_shifts = get_shifts_for_month(today.strftime("%Y-%m"))
-    month_total = sum(shift_details(shift)["earnings"] for shift in month_shifts)
+    month_shifts = [shift_details(shift) for shift in get_shifts_for_month(month)]
+
+    earned = sum(
+        shift["earnings"] for shift in month_shifts if shift["shift_date"] <= today_text
+    )
+    booked = sum(
+        shift["earnings"] for shift in month_shifts if shift["shift_date"] > today_text
+    )
+
+    goal = get_goal(month)
+    still_to_find = max(goal - earned - booked, 0) if goal else None
+
     return render_template(
         "index.html",
         shifts=shifts,
         profiles=get_profiles(),
+        month=month,
         month_name=today.strftime("%B %Y"),
-        month_total=month_total,
+        earned=earned,
+        booked=booked,
+        goal=goal,
+        still_to_find=still_to_find,
     )
+
+
+@app.route("/goal", methods=["POST"])
+def save_goal():
+    month = request.form["month"]
+    target = float(request.form["target"])
+    set_goal(month, target)
+    return redirect("/")
 
 
 @app.route("/add", methods=["POST"])

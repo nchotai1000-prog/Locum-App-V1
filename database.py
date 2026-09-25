@@ -41,6 +41,14 @@ def init_db():
         )
         """
     )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS goals (
+            month TEXT PRIMARY KEY,
+            target REAL NOT NULL
+        )
+        """
+    )
     connection.commit()
     connection.close()
 
@@ -139,3 +147,25 @@ def delete_shift(shift_id):
     connection.execute("DELETE FROM shifts WHERE id = ?", (shift_id,))
     connection.commit()
     connection.close()
+
+
+def set_goal(month, target):
+    connection = get_connection()
+    connection.execute(
+        """
+        INSERT INTO goals (month, target) VALUES (?, ?)
+        ON CONFLICT(month) DO UPDATE SET target = excluded.target
+        """,
+        (month, target),
+    )
+    connection.commit()
+    connection.close()
+
+
+def get_goal(month):
+    connection = get_connection()
+    row = connection.execute(
+        "SELECT target FROM goals WHERE month = ?", (month,)
+    ).fetchone()
+    connection.close()
+    return row["target"] if row else None
