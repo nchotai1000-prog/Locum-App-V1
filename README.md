@@ -1,5 +1,7 @@
 # Locum Tracker
 
+**Try the live demo:** https://locumtracker.pythonanywhere.com
+
 A simple web app to log locum shifts and track monthly earnings.
 
 ## Features
