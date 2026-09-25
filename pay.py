@@ -1,3 +1,5 @@
+import math
+
 MINUTES_PER_DAY = 1440
 
 
@@ -39,3 +41,11 @@ def calculate_earnings(
         start_time, end_time, ooh_start_time, ooh_end_time
     )
     return day_minutes / 60 * day_rate + ooh_minutes / 60 * ooh_rate
+
+
+def shifts_needed(amount, earnings_per_shift):
+    if amount <= 0:
+        return 0
+    if earnings_per_shift <= 0:
+        return None
+    return math.ceil(round(amount / earnings_per_shift, 6))

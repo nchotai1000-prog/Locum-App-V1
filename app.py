@@ -7,13 +7,14 @@ from database import (
     delete_profile,
     delete_shift,
     get_goal,
+    get_profile,
     get_profiles,
     get_shifts,
     get_shifts_for_month,
     init_db,
     set_goal,
 )
-from pay import calculate_earnings, split_minutes
+from pay import calculate_earnings, shifts_needed, split_minutes
 
 app = Flask(__name__)
 init_db()
@@ -61,6 +62,27 @@ def index():
     goal = get_goal(month)
     still_to_find = max(goal - earned - booked, 0) if goal else None
 
+    estimate_profile_id = request.args.get("estimate_profile", type=int)
+    estimate_start = request.args.get("estimate_start", "08:00")
+    estimate_end = request.args.get("estimate_end", "20:00")
+    estimate = None
+    if goal and estimate_profile_id:
+        profile = get_profile(estimate_profile_id)
+        if profile:
+            per_shift = calculate_earnings(
+                estimate_start,
+                estimate_end,
+                profile["ooh_start"],
+                profile["ooh_end"],
+                profile["day_rate"],
+                profile["ooh_rate"],
+            )
+            estimate = {
+                "profile_name": profile["name"],
+                "per_shift": per_shift,
+                "needed": shifts_needed(still_to_find, per_shift),
+            }
+
     return render_template(
         "index.html",
         shifts=shifts,
@@ -71,6 +93,10 @@ def index():
         booked=booked,
         goal=goal,
         still_to_find=still_to_find,
+        estimate=estimate,
+        estimate_profile_id=estimate_profile_id,
+        estimate_start=estimate_start,
+        estimate_end=estimate_end,
     )
 
 

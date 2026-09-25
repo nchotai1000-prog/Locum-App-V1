@@ -76,6 +76,15 @@ def get_profiles():
     return profiles
 
 
+def get_profile(profile_id):
+    connection = get_connection()
+    profile = connection.execute(
+        "SELECT * FROM profiles WHERE id = ?", (profile_id,)
+    ).fetchone()
+    connection.close()
+    return profile
+
+
 def delete_profile(profile_id):
     connection = get_connection()
     connection.execute("DELETE FROM profiles WHERE id = ?", (profile_id,))

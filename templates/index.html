@@ -37,6 +37,45 @@
         <button type="submit">Save target</button>
     </form>
 
+
+    {% if goal %}
+    <h3>How many more shifts?</h3>
+    <form method="get" action="/">
+        <p>
+            <label for="estimate_profile">Profile</label>
+            <select id="estimate_profile" name="estimate_profile" required>
+                <option value="">Choose a profile</option>
+                {% for profile in profiles %}
+                <option value="{{ profile['id'] }}" {% if profile['id'] == estimate_profile_id %}selected{% endif %}>
+                    {{ profile['name'] }}
+                </option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label for="estimate_start">Typical shift</label>
+            <input type="time" id="estimate_start" name="estimate_start" value="{{ estimate_start }}" required>
+            to
+            <input type="time" id="estimate_end" name="estimate_end" value="{{ estimate_end }}" required>
+        </p>
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if estimate %}
+    <p>
+        One {{ estimate["profile_name"] }} shift ({{ estimate_start }}–{{ estimate_end }})
+        pays <strong>£{{ "%.2f"|format(estimate["per_shift"]) }}</strong>.
+        {% if estimate["needed"] is none %}
+        Can't estimate, because this shift pays £0.
+        {% elif estimate["needed"] == 0 %}
+        Your target is already covered.
+        {% else %}
+        You need <strong>{{ estimate["needed"] }}</strong> more shift{{ "s" if estimate["needed"] != 1 }}.
+        {% endif %}
+    </p>
+    {% endif %}
+    {% endif %}
+
     <h2>Log a shift</h2>
     <form method="post" action="/add">
         <p>
