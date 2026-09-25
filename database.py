@@ -14,11 +14,10 @@ def init_db():
     connection = get_connection()
     connection.execute(
         """
-        CREATE TABLE IF NOT EXISTS shifts (
+        CREATE TABLE IF NOT EXISTS profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            shift_date TEXT NOT NULL,
-            start_time TEXT NOT NULL,
-            end_time TEXT NOT NULL,
+            name TEXT NOT NULL,
+            specialty TEXT NOT NULL DEFAULT '',
             day_rate REAL NOT NULL,
             ooh_rate REAL NOT NULL,
             ooh_start TEXT NOT NULL,
@@ -26,19 +25,86 @@ def init_db():
         )
         """
     )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS shifts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            shift_date TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT NOT NULL,
+            specialty TEXT NOT NULL DEFAULT '',
+            day_rate REAL NOT NULL,
+            ooh_rate REAL NOT NULL,
+            ooh_start TEXT NOT NULL,
+            ooh_end TEXT NOT NULL,
+            profile_id INTEGER REFERENCES profiles(id)
+        )
+        """
+    )
     connection.commit()
     connection.close()
 
 
-def add_shift(shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end):
+def add_profile(name, specialty, day_rate, ooh_rate, ooh_start, ooh_end):
+    connection = get_connection()
+    connection.execute(
+        """
+        INSERT INTO profiles
+            (name, specialty, day_rate, ooh_rate, ooh_start, ooh_end)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (name, specialty, day_rate, ooh_rate, ooh_start, ooh_end),
+    )
+    connection.commit()
+    connection.close()
+
+
+def get_profiles():
+    connection = get_connection()
+    profiles = connection.execute(
+        "SELECT * FROM profiles ORDER BY name"
+    ).fetchall()
+    connection.close()
+    return profiles
+
+
+def delete_profile(profile_id):
+    connection = get_connection()
+    connection.execute("DELETE FROM profiles WHERE id = ?", (profile_id,))
+    connection.commit()
+    connection.close()
+
+
+def add_shift(
+    shift_date,
+    start_time,
+    end_time,
+    specialty,
+    day_rate,
+    ooh_rate,
+    ooh_start,
+    ooh_end,
+    profile_id,
+):
     connection = get_connection()
     connection.execute(
         """
         INSERT INTO shifts
-            (shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            (shift_date, start_time, end_time, specialty, day_rate, ooh_rate,
+             ooh_start, ooh_end, profile_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, ooh_end),
+        (
+            shift_date,
+            start_time,
+            end_time,
+            specialty,
+            day_rate,
+            ooh_rate,
+            ooh_start,
+            ooh_end,
+            profile_id,
+        ),
     )
     connection.commit()
     connection.close()
@@ -47,7 +113,12 @@ def add_shift(shift_date, start_time, end_time, day_rate, ooh_rate, ooh_start, o
 def get_shifts():
     connection = get_connection()
     shifts = connection.execute(
-        "SELECT * FROM shifts ORDER BY shift_date DESC, start_time DESC, id DESC"
+        """
+        SELECT shifts.*, profiles.name AS profile_name
+        FROM shifts
+        LEFT JOIN profiles ON shifts.profile_id = profiles.id
+        ORDER BY shifts.shift_date DESC, shifts.start_time DESC, shifts.id DESC
+        """
     ).fetchall()
     connection.close()
     return shifts

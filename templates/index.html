@@ -13,6 +13,7 @@
     </p>
 
     <h1>Locum Tracker</h1>
+    <p><a href="/profiles">Manage rate profiles &rarr;</a></p>
 
     <h2>This month</h2>
     <p>{{ month_name }}: <strong>£{{ "%.2f"|format(month_total) }}</strong></p>
@@ -32,6 +33,26 @@
             <input type="time" id="end_time" name="end_time" required>
         </p>
         <p>
+            <label for="profile_id">Rate profile</label>
+            <select id="profile_id" name="profile_id">
+                <option value="">Custom (enter rates below)</option>
+                {% for profile in profiles %}
+                <option value="{{ profile['id'] }}"
+                        data-specialty="{{ profile['specialty'] }}"
+                        data-day-rate="{{ profile['day_rate'] }}"
+                        data-ooh-rate="{{ profile['ooh_rate'] }}"
+                        data-ooh-start="{{ profile['ooh_start'] }}"
+                        data-ooh-end="{{ profile['ooh_end'] }}">
+                    {{ profile['name'] }}
+                </option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <label for="specialty">Specialty</label>
+            <input type="text" id="specialty" name="specialty" placeholder="Optional">
+        </p>
+        <p>
             <label for="day_rate">Day rate (£/hr)</label>
             <input type="number" id="day_rate" name="day_rate" step="0.01" min="0" required>
         </p>
@@ -47,6 +68,7 @@
             <label for="ooh_end">OOH ends</label>
             <input type="time" id="ooh_end" name="ooh_end" value="08:00" required>
         </p>
+        <p><small>Choosing a profile fills in the specialty and rates. You can still change them for this shift.</small></p>
         <p><small>If the end time is earlier than the start time, the shift is treated as finishing the next day.</small></p>
         <button type="submit">Save shift</button>
     </form>
@@ -86,5 +108,23 @@
     {% else %}
     <p>No shifts logged yet.</p>
     {% endif %}
+
+    <script>
+        const profileSelect = document.getElementById("profile_id");
+
+        profileSelect.addEventListener("change", function () {
+            const chosen = profileSelect.options[profileSelect.selectedIndex];
+            if (chosen.value === "") {
+                return;
+            }
+            document.getElementById("specialty").value = chosen.dataset.specialty;
+            document.getElementById("day_rate").value = chosen.dataset.dayRate;
+            document.getElementById("ooh_rate").value = chosen.dataset.oohRate;
+            document.getElementById("ooh_start").value = chosen.dataset.oohStart;
+            document.getElementById("ooh_end").value = chosen.dataset.oohEnd;
+        });
+    </script>
 </body>
 </html>
+
+
