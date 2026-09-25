@@ -4,6 +4,7 @@ from flask import Flask, redirect, render_template, request
 from database import add_shift, delete_shift, get_month_total, get_shifts, init_db
 
 app = Flask(__name__)
+init_db()
 
 
 @app.template_filter("uk_date")
@@ -40,5 +41,4 @@ def delete(shift_id):
 
 
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)

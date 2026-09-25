@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-DATABASE = "locum.db"
+DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "locum.db")
 
 
 def get_connection():
